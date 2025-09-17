@@ -1,0 +1,49 @@
+ssl:
+  rootca: '/opt/splunk/etc/auth/certs/cacert.pem'
+
+privileged-account:
+  provider:
+    type: 'PAM'
+    url: 'https://<Cyberark_Host>/AIMWebService/api/Accounts'
+    config: './sample_config.ini'
+  name: 'admin'
+  safe: '<Safe_Name>'
+  appid: '<Cyberark_app_id>'
+  extra-params:
+    address: '<cyberark_object_address>'
+
+sync-accounts:
+  provider:
+    type: 'PAM'
+    url: 'https://<Cyberark_Host>/AIMWebService/api/Accounts'
+    config: './sample_config.ini'
+  safe: '<Safe_Name>'
+  appid: '<Cyberark_app_id>'
+  force: False
+  accounts:
+	# this example is for an account that is used as a bindDN account for active directory
+	# expects a custom location within splunk
+    -
+      pamUsername: '<cyberark_obj_username>'
+      hostname: '<splunk_host>'
+      username: '<splunk_username>'
+      app: '<splunk_app_for_credential_storage>'
+      type: 'CUSTOM_API'
+      extra:
+        api:
+          endpoint: '/servicesNS/nobody/<splunk_app_for_credential_storage>/configs/conf-authentication'
+          reload: '/services/authentication/providers/services/_reload'
+          stanza: '<Stanza_name>'
+          field: 'bindDNpassword'
+          encrypt: true
+
+	# this example is for an account that utilizes the common passwords.conf storage pattern
+    -
+      pamUsername: '<cyberark_object_username>'
+      hostname: '<splunk_host>'
+      username: '<splunk_username>'
+      app: '<splunk_app_for_credential_storage>'
+      realm: '<splunk_app_realm>'
+      type: 'PASSWORDS_CONF'
+      extra-params:
+        address: '<cyberark_object_address>'
